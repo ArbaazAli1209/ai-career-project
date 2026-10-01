@@ -26,12 +26,12 @@ Generate a strong Auth.js secret locally with `openssl rand -base64 32`. Do not 
 ## Environment Variables
 | Variable | Required | Description |
 | --- | --- | --- |
-| `MONGODB_URI` | Yes | MongoDB connection string for Atlas or local MongoDB. |
+| `MONGODB_URI` | Yes | MongoDB connection string for Compass or local MongoDB. |
 | `NEXTAUTH_URL` | Production | Public deployment URL used by Auth.js. |
 | `NEXTAUTH_SECRET` | Production | Secret used to sign/encrypt Auth.js session tokens. |
 | `GROQ_API_KEY` | For analysis | Server-only API key from your Groq account. |
-| `GROQ_MODEL` | No | Groq model name; defaults to `llama-3.3-70b-versatile`. |
-| `GROQ_API_BASE_URL` | No | Groq-compatible endpoint; defaults to `https://api.groq.com/openai/v1`. |
+| `GROQ_MODEL` | No | Groq model name; defaults to `openai/gpt-oss-120b`. |
+| `GROQ_API_BASE_URL` | No | Groq-compatible endpoint; defaults to `https://console.groq.com/home`. |
 
 Analysis is unavailable until the LLM key and model are configured. No AI credentials are needed to build the application.
 
