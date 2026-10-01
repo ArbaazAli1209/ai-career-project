@@ -17,7 +17,7 @@ Next.js App Router, React, TypeScript, Tailwind CSS, MongoDB Atlas with Mongoose
 
 ## Local Setup
 1. Use Node.js 20.19 or newer and install dependencies with `npm install`.
-2. Copy `.env.example` to `.env.local` and set `MONGODB_URI`, `NEXTAUTH_SECRET`, and `GROQ_API_KEY`. The example uses Groq's OpenAI-compatible endpoint and `llama-3.3-70b-versatile`; override `GROQ_MODEL` if you choose another Groq model.
+2. Copy `.env.example` to `.env.local` and set `MONGODB_URI`, `NEXTAUTH_SECRET`, and `GROQ_API_KEY`. The example uses Groq's OpenAI-compatible endpoint and `openai/gpt-oss-120b`; override `GROQ_MODEL` if you choose another Groq model.
 3. Start MongoDB locally or create an Atlas database and allow the development machine's IP in Atlas Network Access.
 4. Start the app with `npm run dev`, then open [http://localhost:3000](http://localhost:3000).
 
