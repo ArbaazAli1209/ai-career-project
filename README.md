@@ -2,6 +2,8 @@
 
 Northstar helps students compare a resume with an internship or job description, understand skill alignment, plan targeted learning, choose portfolio projects, and practice for interviews.
 
+Live Demo: https://ai-career-project-xi.vercel.app/
+
 ## Features
 - Email/password registration and sign-in with Auth.js Credentials and JWT sessions.
 - PDF resume upload with size and signature checks, chunked transfer, MongoDB GridFS storage, and server-side text extraction.
