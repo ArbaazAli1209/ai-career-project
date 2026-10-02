@@ -12,7 +12,7 @@ export async function analyzeCareer(resumeText: string, jobDescription: string) 
     analyzeResume(resumeText),
     analyzeJobDescription(jobDescription),
   ]);
-  const { skills, alignment } = analyzeSkillGaps(resume, role);
+  const { skillGapAnalysis, skills, alignment } = await analyzeSkillGaps(resume, role);
   const [roadmap, projects, interviews] = await Promise.all([
     generateCareerRoadmap(resume, role, skills),
     recommendProjects(resume, role, skills),
@@ -21,6 +21,6 @@ export async function analyzeCareer(resumeText: string, jobDescription: string) 
 
   return {
     alignment,
-    result: careerAnalysisResultSchema.parse({ resume, role, alignment, skills, roadmap, projects, interviews }),
+    result: careerAnalysisResultSchema.parse({ resume, role, alignment, skills, skillGapAnalysis, roadmap, projects, interviews }),
   };
 }

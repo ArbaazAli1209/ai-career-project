@@ -36,7 +36,7 @@ Generate a strong Auth.js secret locally with `openssl rand -base64 32`. Do not 
 Analysis is unavailable until the LLM key and model are configured. No AI credentials are needed to build the application.
 
 ## Resume and Data Handling
-PDF uploads are limited to 15 MiB and transferred in 1 MiB chunks so individual requests remain below common serverless body limits. Chunks are staged in MongoDB with a one-hour TTL, assembled into the `resumes` GridFS bucket, then removed after successful processing. Extracted text is stored on the owner's Resume record; structured career results are stored in CareerAnalysis. All resume, analysis, and download queries are scoped to the signed-in user.
+PDF uploads are limited to 15 MiB and transferred in 1 MiB chunks so individual requests remain below common serverless body limits. Chunks are staged in MongoDB with a one-hour TTL, assembled into the `resumes` GridFS bucket, then removed after successful processing. Text extraction runs locally on the server; image-only PDFs fall back to English OCR for the first four pages. OCR does not send the PDF to Groq or another external service and requires outbound access to download Tesseract's English language data on a cold start. Extracted text is stored on the owner's Resume record; structured career results are stored in CareerAnalysis. All resume, analysis, and download queries are scoped to the signed-in user.
 
 The alignment percentage is an estimate from extracted resume evidence and job requirements. It is not a hiring prediction. AI-generated guidance should be reviewed for accuracy and adapted to the student's real experience.
 

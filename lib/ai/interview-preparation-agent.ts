@@ -12,7 +12,7 @@ const questionsSchema = z.object({
 export function prepareInterview(resume: ResumeAnalysis, role: JobAnalysis) {
   return generateStructured(
     "Prepare a student for the supplied role. Create distinct technical, behavioral, and resume-specific questions. For each include the question, whyItMatters, and an answerApproach, not a fabricated personal answer. Return one JSON object with those three arrays.",
-    JSON.stringify({ resumeSummary: resume.summary, experience: resume.experienceHighlights, targetRole: role.roleTitle, responsibilities: role.responsibilities, requiredSkills: role.requiredSkills }),
+    JSON.stringify({ resumeSummary: resume.summary, experience: resume.experience, targetRole: role.roleTitle, responsibilities: role.responsibilities, requiredSkills: role.requiredSkills }),
     questionsSchema,
   );
 }

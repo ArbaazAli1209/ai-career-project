@@ -293,6 +293,17 @@ button, input, textarea { font: inherit; }
 .skill-name small { margin-top: 3px; color: #8a958d; font-size: 9px; }
 .skill-row > p { margin: 0; color: #738077; font-size: 10px; line-height: 1.5; }
 .skill-status-label { color: #748177; font-size: 9px; white-space: nowrap; }
+.gap-explanations { margin-top: 17px; padding: 12px 14px; border-left: 2px solid var(--moss); background: #f0f4e8; }
+.gap-explanations p { margin: 0; color: #58665d; font-size: 10px; line-height: 1.6; }
+.gap-explanations p + p { margin-top: 7px; }
+.gap-explanations strong { margin-right: 7px; color: var(--forest); }
+.role-requirements { margin-top: 13px; border-bottom: 1px solid var(--line); }
+.role-requirements summary { width: max-content; max-width: 100%; padding: 10px 0; color: var(--moss); font-size: 10px; font-weight: 650; cursor: pointer; }
+.role-requirements ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.role-requirements li { padding: 10px 5px; display: grid; grid-template-columns: 65px minmax(100px, .7fr) 1.3fr; gap: 10px; border-bottom: 1px solid var(--line); font-size: 9px; }
+.role-requirements li > span { color: #78847b; }
+.role-requirements li > strong { color: var(--ink); }
+.role-requirements li > small { color: #748077; line-height: 1.5; }
 .empty-inline { color: var(--muted); font-size: 11px; }
 .roadmap-list { position: relative; border-top: 1px solid var(--line); }
 .roadmap-item { min-height: 129px; padding: 20px 8px; display: grid; grid-template-columns: 112px 1fr; gap: 20px; border-bottom: 1px solid var(--line); }
@@ -395,6 +406,8 @@ button, input, textarea { font: inherit; }
   .skill-row { grid-template-columns: 17px 1fr auto; gap: 8px; }
   .skill-row > p { grid-column: 2 / 4; grid-row: 2; }
   .skill-status-label { font-size: 8px; }
+  .role-requirements li { grid-template-columns: 55px 1fr; }
+  .role-requirements li > small { grid-column: 2; }
   .roadmap-item { grid-template-columns: 70px 1fr; gap: 12px; }
   .roadmap-week { font-size: 8px; }
   .project-list { grid-template-columns: 1fr; }

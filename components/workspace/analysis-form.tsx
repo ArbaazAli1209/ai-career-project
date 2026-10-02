@@ -3,6 +3,8 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, FileUp, LoaderCircle, Sparkles } from "lucide-react";
+import { hasPdfHeader } from "@/lib/resume/pdf-validation";
+import { maxResumeSize } from "@/lib/resume/upload-config";
 
 type ResumeChoice = { id: string; fileName: string; createdAt: string };
 
@@ -23,9 +25,11 @@ export function AnalysisForm({ resumes: initialResumes }: { resumes: ResumeChoic
   const [error, setError] = useState("");
 
   async function uploadResume(selectedFile: File) {
-    if (selectedFile.size > 15 * 1024 * 1024) throw new Error("Choose a PDF smaller than 15 MB.");
-    const signature = new Uint8Array(await selectedFile.slice(0, 5).arrayBuffer());
-    if (new TextDecoder().decode(signature) !== "%PDF-") throw new Error("That file does not look like a valid PDF.");
+    if (!selectedFile.size) throw new Error("Choose a non-empty PDF file.");
+    if (selectedFile.size > maxResumeSize) throw new Error("Choose a PDF smaller than 15 MB.");
+    if (!selectedFile.name.toLowerCase().endsWith(".pdf")) throw new Error("Choose a file with the .pdf extension.");
+    const header = new Uint8Array(await selectedFile.slice(0, 1024).arrayBuffer());
+    if (!hasPdfHeader(header)) throw new Error("That file does not have a valid PDF signature.");
 
     setStage("Preparing your resume");
     const startResponse = await fetch("/api/resumes/uploads", {

@@ -28,6 +28,7 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
     partial: result.skills.filter((skill) => skill.status === "partial").length,
     missing: result.skills.filter((skill) => skill.status === "missing").length,
   };
+  const skillGapAnalysis = result.skillGapAnalysis;
 
   return (
       <div className="result-page">
@@ -35,13 +36,15 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
         <header className="result-heading"><div><p className="eyebrow eyebrow-dark"><span className="eyebrow-line" /> YOUR ROLE SNAPSHOT</p><h1>{analysis.roleTitle}</h1><p>{analysis.company} <span className="heading-divider">/</span> {result.role.seniority}</p></div><span className="result-pill"><Sparkles size={15} /> Career plan ready</span></header>
 
         <section className="result-overview">
-          <div className="alignment-overview"><div><p className="eyebrow eyebrow-dark"><span className="eyebrow-line" /> ESTIMATED SKILL ALIGNMENT</p><h2>A strong start<br />with room to <em>grow.</em></h2><p className="alignment-note">An evidence-based estimate from skills listed in your resume compared with this role. It is guidance, not a hiring prediction.</p></div><AlignmentChart alignment={result.alignment} /></div>
+          <div className="alignment-overview"><div><p className="eyebrow eyebrow-dark"><span className="eyebrow-line" /> AI-ESTIMATED SKILL ALIGNMENT</p><h2>A strong start<br />with room to <em>grow.</em></h2><p className="alignment-note">An AI estimate based on structured resume evidence and this role&apos;s requirements. It is guidance, not a hiring prediction.</p></div><AlignmentChart alignment={result.alignment} /></div>
           <div className="skill-counts"><div><span className="count-mark matched-mark" /><strong>{skillCounts.matched}</strong><span>Matched</span></div><div><span className="count-mark partial-mark" /><strong>{skillCounts.partial}</strong><span>Partial</span></div><div><span className="count-mark missing-mark" /><strong>{skillCounts.missing}</strong><span>To build</span></div></div>
         </section>
 
         <section className="result-section skill-section"><div className="result-section-heading"><span className="section-icon"><BookOpenCheck size={18} /></span><div><p className="eyebrow eyebrow-dark"><span className="eyebrow-line" /> SKILL LANDSCAPE</p><h2>What the role needs</h2><p>Evidence comes from your resume text. Missing evidence does not mean you lack the skill.</p></div></div>
           <div className="skill-list">{result.skills.map((skill) => { const Icon = statusIcons[skill.status]; return <article className={`skill-row skill-${skill.status}`} key={skill.name}><Icon size={17} /><div className="skill-name"><strong>{skill.name}</strong><small>{skill.category}</small></div><p>{skill.evidence}</p><span className="skill-status-label">{statusLabels[skill.status]}</span></article>; })}</div>
           {!result.skills.length && <p className="empty-inline">The job description did not list specific skills to compare.</p>}
+          {skillGapAnalysis && <div className="gap-explanations" aria-label="Alignment explanations">{skillGapAnalysis.explanations.map((item) => <p key={item.topic}><strong>{item.topic}</strong>{item.explanation}</p>)}</div>}
+          {skillGapAnalysis?.roleRequirements.length ? <details className="role-requirements"><summary>View {skillGapAnalysis.roleRequirements.length} structured role requirements</summary><ul>{skillGapAnalysis.roleRequirements.map((requirement) => <li key={requirement.name}><span>{requirement.importance === "required" ? "Required" : "Preferred"}</span><strong>{requirement.name}</strong><small>{requirement.description}</small></li>)}</ul></details> : null}
         </section>
 
         <section className="result-section roadmap-section"><div className="result-section-heading"><span className="section-icon lime-icon"><Lightbulb size={18} /></span><div><p className="eyebrow eyebrow-dark"><span className="eyebrow-line" /> YOUR NEXT FEW WEEKS</p><h2>A roadmap that moves you forward</h2><p>Small, concrete actions connected to the skills this role values.</p></div></div>

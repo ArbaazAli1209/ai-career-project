@@ -4,9 +4,11 @@ import { connectToDatabase } from "@/lib/db/connect";
 import { deletePdfFromGridFs, savePdfToGridFs } from "@/lib/db/gridfs";
 import { ResumeModel } from "@/lib/db/models/Resume";
 import { UploadChunkModel, UploadSessionModel } from "@/lib/db/models/UploadSession";
-import { extractPdfText } from "@/lib/resume/parse-pdf";
+import { extractPdfText, PdfTextExtractionError } from "@/lib/resume/parse-pdf";
+import { toNodeBuffer } from "@/lib/resume/chunk-buffer";
 import { jsonError, jsonResponse } from "@/lib/http";
 import { uploadCompleteResponseSchema } from "@/lib/validation/schemas";
+import { hasPdfHeader } from "@/lib/resume/pdf-validation";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -23,7 +25,7 @@ export async function POST(_request: Request, context: { params: Promise<{ uploa
     const session = await UploadSessionModel.findOneAndUpdate(
       { _id: uploadId, ownerId, status: "open", expiresAt: { $gt: new Date() } },
       { $set: { status: "finalizing" } },
-      { new: true },
+      { returnDocument: "after" },
     );
     if (!session) return jsonError("Upload session is missing, expired, or already being processed.", 404);
     const chunks = await UploadChunkModel.find({ uploadId: session._id, ownerId }).sort({ index: 1 }).lean();
@@ -31,8 +33,17 @@ export async function POST(_request: Request, context: { params: Promise<{ uploa
       await UploadSessionModel.updateOne({ _id: session._id, ownerId }, { $set: { status: "open" } });
       return jsonError("Some parts are missing. Please retry the upload.", 409);
     }
-    const contents = Buffer.concat(chunks.map((chunk) => chunk.data));
-    if (contents.length !== session.fileSize || contents.subarray(0, 5).toString("ascii") !== "%PDF-") {
+    const binaryChunks = chunks.map((chunk) => toNodeBuffer(chunk.data));
+    const uploadedSize = binaryChunks.reduce((total, chunk) => total + chunk.length, 0);
+    if (uploadedSize !== session.fileSize) {
+      await Promise.all([
+        UploadChunkModel.deleteMany({ uploadId: session._id, ownerId }),
+        UploadSessionModel.deleteOne({ _id: session._id, ownerId }),
+      ]);
+      return jsonError("Uploaded PDF data was incomplete. Please upload the file again.", 400);
+    }
+    const contents = Buffer.concat(binaryChunks, uploadedSize);
+    if (contents.length !== session.fileSize || !hasPdfHeader(contents)) {
       await Promise.all([
         UploadChunkModel.deleteMany({ uploadId: session._id, ownerId }),
         UploadSessionModel.deleteOne({ _id: session._id, ownerId }),
@@ -45,7 +56,7 @@ export async function POST(_request: Request, context: { params: Promise<{ uploa
     try {
       extractedText = await extractPdfText(contents);
     } catch (error) {
-      if (error instanceof Error && error.message.includes("selectable text")) {
+      if (error instanceof PdfTextExtractionError) {
         await deletePdfFromGridFs(gridFsId);
         gridFsId = undefined;
         await Promise.all([
