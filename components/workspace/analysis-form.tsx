@@ -10,7 +10,7 @@ type ResumeChoice = { id: string; fileName: string; createdAt: string };
 
 async function responseError(response: Response) {
   const body = await response.json().catch(() => null) as { error?: string } | null;
-  return body?.error ?? "Something went wrong. Please try again.";
+  return body?.error ?? `The server returned an unexpected response (HTTP ${response.status}). Check the terminal running "npm run dev" for details.`;
 }
 
 export function AnalysisForm({ resumes: initialResumes }: { resumes: ResumeChoice[] }) {
