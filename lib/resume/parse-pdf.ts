@@ -1,11 +1,30 @@
 import "server-only";
+import { existsSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { PDFParse } from "pdf-parse";
 import Tesseract from "tesseract.js";
 
 const minimumResumeTextLength = 40;
 const maximumOcrPages = 4;
 
+// Tesseract language data. Prefer the eng.traineddata bundled in the project root so OCR
+// works offline and on serverless hosts; otherwise fall back to Tesseract's CDN download,
+// caching into the OS temp directory (the only writable location on most serverless hosts).
+function tesseractWorkerOptions() {
+  const languageDirectory = process.cwd();
+  if (existsSync(path.join(languageDirectory, "eng.traineddata"))) {
+    return { langPath: languageDirectory, gzip: false, cacheMethod: "none" as const };
+  }
+  return { cachePath: tmpdir() };
+}
+
 function logPdfStageError(stage: string, error: unknown) {
+  if (typeof error === "string") {
+    // Tesseract workers reject with plain strings rather than Error objects.
+    console.error(`${stage} failed`, { message: error.slice(0, 300) });
+    return;
+  }
   if (error instanceof Error) {
     const code = "code" in error && typeof error.code === "string" ? error.code : undefined;
     console.error(`${stage} failed`, {
@@ -37,7 +56,7 @@ async function recognizeScannedPages(contents: Buffer) {
     if (!screenshots.pages.length) return "";
 
     try {
-      worker = await Tesseract.createWorker("eng");
+      worker = await Tesseract.createWorker("eng", undefined, tesseractWorkerOptions());
     } catch (error) {
       logPdfStageError("Tesseract worker initialization", error);
       throw error;
